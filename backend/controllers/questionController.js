@@ -1,4 +1,5 @@
 const Question = require('../models/Question');
+const sendMail = require('../utils/sendMail');
 
 // Lấy tất cả câu hỏi
 const getAllQuestions = async (req, res) => {
@@ -28,10 +29,22 @@ const postQuestion = async (req, res) => {
     });
 
     await newQuestion.save();
+
+    // Trả về kết quả cho client NGAY LẬP TỨC
     res.status(200).json({
       message: 'Đăng bài thành công',
       question: newQuestion,
     });
+
+    // Gửi email SAU khi đã trả về kết quả (không await)
+    sendMail(
+      'vutrongtien215@gmail.com',
+      'Có bài đăng mới trên diễn đàn',
+      `Tiêu đề: ${newQuestion.title}\nNội dung: ${newQuestion.content}`
+    ).catch(mailErr => {
+      console.error('Lỗi gửi mail:', mailErr);
+    });
+
   } catch (error) {
     res.status(500).json({ message: 'Đã xảy ra lỗi khi đăng bài', error: error.message });
   }
@@ -68,6 +81,17 @@ const addComment = async (req, res) => {
     await question.save();
 
     res.status(200).json({ message: 'Bình luận đã được thêm', question });
+
+    // Gửi email thông báo có bình luận mới
+    try {
+      await sendMail(
+        'vutrongtien215@gmail.com',
+        'Có bình luận mới trên diễn đàn',
+        `Bài: ${question.title}\nBình luận: ${comment}\nNgười bình luận: ${username}`
+      );
+    } catch (mailErr) {
+      console.error('Lỗi gửi mail:', mailErr);
+    }
   } catch (error) {
     res.status(500).json({ message: 'Đã xảy ra lỗi khi thêm bình luận', error: error.message });
   }
