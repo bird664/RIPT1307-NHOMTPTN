@@ -6,6 +6,8 @@ import LoginPage from './login';
 import PostQuestionPage from './postQuestion'; // Đảm bảo rằng bạn đã import đúng
 import RegisterPage from './register';
 import QuestionDetailPage from './questions';
+import QuestionList from './search';
+import AdminDashboard from './admin/AdminDashboard';
 
 const IndexPage: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -24,9 +26,10 @@ const IndexPage: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage setUser={setUser} />} />
-        <Route path="/post-question" element={<PostQuestionPage />} />{' '}
-        {/* Đảm bảo bạn đã thêm route này */}
-        <Route path='questions/:id' element={<QuestionDetailPage />} />
+        <Route path="/post-question" element={<PostQuestionPage />} />
+        <Route path="questions/:id" element={<QuestionDetailPage />} />
+        <Route path="/search" element={<QuestionList />} />
+        <Route path="/admin/*" element={<AdminDashboard />} />
       </Routes>
     </BasicLayout>
   );

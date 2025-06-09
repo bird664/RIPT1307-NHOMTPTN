@@ -130,7 +130,50 @@ const voteComment = async (req, res) => {
     res.status(500).json({ message: 'Lỗi khi vote bình luận', error: error.message });
   }
 };
+// Tìm kiếm câu hỏi theo từ khóa
 
+// Lọc câu hỏi theo tag
+const getQuestionsByTag = async (req, res) => {
+  const { tag } = req.params;  // Lấy tag từ params
+
+  try {
+    const questions = await Question.find({
+      tags: { $in: [tag] }  // Lọc theo tags
+    });
+
+    res.status(200).json({ questions });
+  } catch (error) {
+    res.status(500).json({ message: 'Đã xảy ra lỗi khi lọc câu hỏi theo tag', error: error.message });
+  }
+};
+// Tìm kiếm câu hỏi theo từ khóa
+const getQuestionsBySearch = async (req, res) => {
+  const { search } = req.query;
+  if (!search || search.trim() === '') {
+    return res.status(400).json({ message: 'Từ khóa tìm kiếm không hợp lệ' });
+  }
+  try {
+    const questions = await Question.find({
+      $or: [
+        { title: { $regex: search, $options: 'i' } },
+        { content: { $regex: search, $options: 'i' } },
+      ],
+    });
+    // Luôn trả về mảng (có thể rỗng)
+    res.status(200).json({ questions });
+  } catch (error) {
+    res.status(500).json({ message: 'Đã xảy ra lỗi khi tìm kiếm câu hỏi', error: error.message });
+  }
+};
+// Xóa bài đăng
+const deleteQuestion = async (req, res) => {
+  try {
+    await Question.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Đã xóa bài đăng' });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi khi xóa bài đăng', error: error.message });
+  }
+};
 module.exports = {
   postQuestion,
   getAllQuestions,  // Thêm hàm lấy tất cả câu hỏi
@@ -139,4 +182,7 @@ module.exports = {
   replyToComment,
   voteQuestion,
   voteComment,
+  getQuestionsBySearch,
+  getQuestionsByTag,
+  deleteQuestion,
 };

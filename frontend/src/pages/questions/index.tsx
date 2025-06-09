@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { message, Input, Button, List, Spin } from 'antd';
+import { message, Input, Button, List, Spin, Space } from 'antd';
+import { LikeOutlined, DislikeOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useParams } from 'umi';
 
 const { TextArea } = Input;
 
 const QuestionDetailPage: React.FC = () => {
-  const { id } = useParams();  // Lấy ID từ URL
+  const { id } = useParams();
   const [question, setQuestion] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [comment, setComment] = useState('');
@@ -14,19 +15,19 @@ const QuestionDetailPage: React.FC = () => {
   const [replyInputs, setReplyInputs] = useState<{ [key: number]: string }>({});
   const [replyVisible, setReplyVisible] = useState<{ [key: number]: boolean }>({});
 
-  useEffect(() => {
-    const fetchQuestion = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/questions/${id}`);
-        setQuestion(response.data.question);
-        setComments(response.data.question.comments || []);
-        setLoading(false);
-      } catch (error) {
-        message.error('Không thể tải bài viết');
-        setLoading(false);
-      }
-    };
+  const fetchQuestion = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/questions/${id}`);
+      setQuestion(response.data.question);
+      setComments(response.data.question.comments || []);
+      setLoading(false);
+    } catch (error) {
+      message.error('Không thể tải bài viết');
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchQuestion();
   }, [id]);
 
@@ -91,6 +92,36 @@ const QuestionDetailPage: React.FC = () => {
     }
   };
 
+  const voteQuestion = async (vote: number) => {
+    try {
+      const res = await axios.post(`http://localhost:5000/api/questions/${id}/vote`, {
+        vote,
+      });
+      setQuestion((prev: any) => ({
+        ...prev,
+        votes: res.data.votes,
+      }));
+    } catch {
+      message.error('Không thể vote bài viết');
+    }
+  };
+
+  const voteComment = async (index: number, vote: number) => {
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/questions/${id}/comments/${index}/vote`,
+        { vote }
+      );
+      setComments((prev) =>
+        prev.map((c, i) =>
+          i === index ? { ...c, votes: res.data.votes } : c
+        )
+      );
+    } catch {
+      message.error('Không thể vote bình luận');
+    }
+  };
+
   if (loading) return <Spin tip="Đang tải..." />;
 
   return (
@@ -100,7 +131,14 @@ const QuestionDetailPage: React.FC = () => {
       <p><strong>Tags:</strong> {question.tags.join(', ')}</p>
       <p>{question.content}</p>
 
-      <h3>Bình luận</h3>
+      {/* Vote cho bài viết */}
+      <Space>
+        <Button icon={<LikeOutlined />} onClick={() => voteQuestion(1)} />
+        <span>{question.votes}</span>
+        <Button icon={<DislikeOutlined />} onClick={() => voteQuestion(-1)} />
+      </Space>
+
+      <h3 style={{ marginTop: 24 }}>Bình luận</h3>
       <List
         dataSource={comments}
         renderItem={(commentItem, index) => (
@@ -110,7 +148,22 @@ const QuestionDetailPage: React.FC = () => {
               description={commentItem.comment}
             />
 
-            {/* Hiển thị phản hồi nếu có */}
+            {/* Vote cho bình luận */}
+            <Space style={{ marginBottom: 4 }}>
+              <Button
+                size="small"
+                icon={<LikeOutlined />}
+                onClick={() => voteComment(index, 1)}
+              />
+              <span>{commentItem.votes || 0}</span>
+              <Button
+                size="small"
+                icon={<DislikeOutlined />}
+                onClick={() => voteComment(index, -1)}
+              />
+            </Space>
+
+            {/* Hiển thị phản hồi */}
             {commentItem.replies?.length > 0 && (
               <div style={{ marginLeft: 20 }}>
                 <strong>Phản hồi:</strong>

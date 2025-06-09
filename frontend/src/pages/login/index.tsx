@@ -30,8 +30,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ setUser }) => {
       localStorage.setItem('user', JSON.stringify(response.data));
 
       navigate('/');
-    } catch (error) {
-      message.error('Đăng nhập không thành công');
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        message.error(error.response.data.message);
+      } else {
+        message.error('Đăng nhập không thành công');
+      }
     }
   };
 
@@ -59,3 +63,4 @@ const LoginPage: React.FC<LoginPageProps> = ({ setUser }) => {
 };
 
 export default LoginPage;
+

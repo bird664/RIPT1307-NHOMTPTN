@@ -1,12 +1,15 @@
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input, message, Select } from 'antd';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'umi';
+
+const { Option } = Select;
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('student');
   const navigate = useNavigate();
 
   const handleRegister = async () => {
@@ -15,6 +18,7 @@ const RegisterPage: React.FC = () => {
         username,
         email,
         password,
+        role,
       });
       message.success('Đăng ký thành công');
       navigate('/login');
@@ -41,6 +45,12 @@ const RegisterPage: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+        </Form.Item>
+        <Form.Item label="Vai trò" required>
+          <Select value={role} onChange={setRole}>
+            <Option value="student">Sinh viên</Option>
+            <Option value="teacher">Giảng viên</Option>
+          </Select>
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">

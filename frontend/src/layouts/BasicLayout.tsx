@@ -78,6 +78,11 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children, user }) => {
             <Menu.Item key="3" icon={<SearchOutlined />}>
               <Link to="/search">Tìm kiếm câu hỏi</Link>
             </Menu.Item>
+            {user && user.role === 'admin' && (
+              <Menu.Item key="4" icon={<UserAddOutlined />}>
+                <Link to="/admin">Quản trị viên</Link>
+              </Menu.Item>
+            )}
           </Menu>
         </Sider>
 
