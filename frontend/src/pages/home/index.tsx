@@ -50,6 +50,17 @@ const HomePage: React.FC = () => {
     return new Date(dateString).toLocaleDateString('vi-VN');
   };
 
+  const handleVote = async (questionId: string, type: 'up' | 'down') => {
+    try {
+      await axios.post(`http://localhost:5000/api/questions/${questionId}/vote`, { type });
+      // Sau khi vote thành công, cập nhật lại danh sách câu hỏi
+      const response = await axios.get('http://localhost:5000/api/questions');
+      setQuestions(response.data.questions);
+    } catch (error) {
+      message.error('Bình chọn thất bại');
+    }
+  };
+
   if (loading) {
     return <div>Đang tải...</div>;
   }
@@ -93,11 +104,19 @@ const HomePage: React.FC = () => {
                   <div className="question-main-wrapper">
                     {/* Vote Section */}
                     <div className="question-vote-section">
-                      <button className="vote-btn" type="button">
+                      <button
+                        className="vote-btn"
+                        type="button"
+                        onClick={() => handleVote(question._id, 'up')}
+                      >
                         <AiOutlineLike className="icon" />
                       </button>
-                      <span className="vote-count">{question.votes || 23}</span>
-                      <button className="vote-btn" type="button">
+                      <span className="vote-count">{question.votes || 0}</span>
+                      <button
+                        className="vote-btn"
+                        type="button"
+                        onClick={() => handleVote(question._id, 'down')}
+                      >
                         <AiOutlineDislike className="icon" />
                       </button>
                     </div>

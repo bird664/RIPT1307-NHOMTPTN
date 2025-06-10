@@ -23,7 +23,7 @@ const QuestionDetailPage: React.FC = () => {
         const response = await axios.get(`http://localhost:5000/api/questions/${id}`);
         setQuestion(response.data.question);
         setComments(response.data.question.comments || []);
-        setQuestionVotes(response.data.question.votes || 23); // Default or from API
+        setQuestionVotes(response.data.question.votes || 0);
         setLoading(false);
       } catch (error) {
         message.error('Không thể tải bài viết');
@@ -33,6 +33,35 @@ const QuestionDetailPage: React.FC = () => {
 
     fetchQuestion();
   }, [id]);
+
+  // ✅ Thêm function vote cho câu hỏi
+  const handleVoteQuestion = async (type: 'up' | 'down') => {
+    try {
+      const response = await axios.post(`http://localhost:5000/api/questions/${id}/vote`, { type });
+      setQuestionVotes(response.data.votes);
+      message.success(`${type === 'up' ? 'Đã upvote' : 'Đã downvote'} câu hỏi`);
+    } catch (error) {
+      message.error('Không thể bình chọn');
+    }
+  };
+
+  // ✅ Thêm function vote cho bình luận
+  const handleVoteComment = async (commentIndex: number, vote: number) => {
+    try {
+      await axios.post(
+        `http://localhost:5000/api/questions/${id}/comments/${commentIndex}/vote`,
+        { vote }
+      );
+      
+      // Cập nhật lại danh sách comments
+      const response = await axios.get(`http://localhost:5000/api/questions/${id}`);
+      setComments(response.data.question.comments || []);
+      
+      message.success(vote > 0 ? 'Đã upvote bình luận' : 'Đã downvote bình luận');
+    } catch (error) {
+      message.error('Không thể bình chọn bình luận');
+    }
+  };
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) {
@@ -100,6 +129,7 @@ const QuestionDetailPage: React.FC = () => {
   };
 
   if (loading) return <div>Đang tải...</div>;
+  
   return (
     <div className="question-detail-container">
       {/* Main Question Card */}
@@ -108,11 +138,19 @@ const QuestionDetailPage: React.FC = () => {
           <div className="question-main-content">
             {/* Vote Section */}
             <div className="vote-section">
-              <button className="vote-btn" type="button">
+              <button 
+                className="vote-btn" 
+                type="button"
+                onClick={() => handleVoteQuestion('up')}
+              >
                 <AiOutlineLike className="icon" />
               </button>
               <span className="vote-count">{questionVotes}</span>
-              <button className="vote-btn" type="button">
+              <button 
+                className="vote-btn" 
+                type="button"
+                onClick={() => handleVoteQuestion('down')}
+              >
                 <AiOutlineDislike className="icon" />
               </button>
             </div>
@@ -175,13 +213,21 @@ const QuestionDetailPage: React.FC = () => {
           {comments.map((commentItem, index) => (
             <div key={index} className="comment-card">
               <div className="comment-content-wrapper">
-                {/* Vote Section */}
+                {/* Vote Section - ✅ Đã sửa để có function */}
                 <div className="comment-vote-section">
-                  <button className="vote-btn" type="button">
+                  <button 
+                    className="vote-btn" 
+                    type="button"
+                    onClick={() => handleVoteComment(index, 1)}
+                  >
                     <AiOutlineLike className="icon-small" />
                   </button>
                   <span className="vote-count-small">{commentItem.votes || 0}</span>
-                  <button className="vote-btn" type="button">
+                  <button 
+                    className="vote-btn" 
+                    type="button"
+                    onClick={() => handleVoteComment(index, -1)}
+                  >
                     <AiOutlineDislike className="icon-small" />
                   </button>
                 </div>
@@ -211,7 +257,7 @@ const QuestionDetailPage: React.FC = () => {
                       <span className="author-name">{commentItem.username}</span>
                       <span className="author-role">Sinh viên</span>
                       <span>•</span>
-                      <span>{formatDate(commentItem.createdAt || new Date().toISOString())}</span>
+                      <span>{formatDate(commentItem.date || new Date().toISOString())}</span>
                     </div>
                   </div>
 
@@ -273,7 +319,7 @@ const QuestionDetailPage: React.FC = () => {
                                 <span className="author-name">{reply.username}</span>
                                 <span className="author-role">Sinh viên</span>
                                 <span>•</span>
-                                <span>{formatDate(reply.createdAt || new Date().toISOString())}</span>
+                                <span>{formatDate(reply.date || new Date().toISOString())}</span>
                               </div>
                             </div>
                           </div>

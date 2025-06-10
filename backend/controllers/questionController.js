@@ -122,18 +122,20 @@ const replyToComment = async (req, res) => {
 };
 const voteQuestion = async (req, res) => {
   const { id } = req.params;
-  const { vote } = req.body; // +1 hoặc -1
-
+  const { type } = req.body; // 'up' hoặc 'down'
   try {
     const question = await Question.findById(id);
-    if (!question) return res.status(404).json({ message: 'Bài viết không tồn tại' });
+    if (!question) return res.status(404).json({ message: 'Không tìm thấy câu hỏi' });
 
-    question.votes += vote;
+    if (type === 'up') {
+      question.votes = (question.votes || 0) + 1;
+    } else if (type === 'down') {
+      question.votes = (question.votes || 0) - 1;
+    }
     await question.save();
-
-    res.status(200).json({ message: 'Đã vote bài viết', votes: question.votes });
+    res.json({ votes: question.votes });
   } catch (error) {
-    res.status(500).json({ message: 'Lỗi khi vote bài viết', error: error.message });
+    res.status(500).json({ message: 'Lỗi bình chọn', error: error.message });
   }
 };
 const voteComment = async (req, res) => {
