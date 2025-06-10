@@ -31,7 +31,9 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children, user }) => {
             <Link to="/" style={{ color: '#000000' }}>Trang chủ</Link>
             <Link to="/post-question" style={{ color: '#000000' }}>Đặt câu hỏi</Link>
             <Link to="/search" style={{ color: '#000000' }}>Tìm kiếm câu hỏi</Link>
-            <Link to="/admin" style={{ color: '#000000' }}>Quản trị viên</Link>
+            {user && user.role === 'admin' && (
+              <Link to="/admin" style={{ color: '#000000' }}>Quản trị viên</Link>
+            )}
           </Col>
           <Col>
             {user ? (

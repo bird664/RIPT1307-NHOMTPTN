@@ -23,7 +23,11 @@ const questionSchema = new mongoose.Schema({
     ],
     }
   ],
-  votes: { type: Number, default: 0 } // ✅ Vote cho bài viết
+  votes: { type: Number, default: 0 },
+  views: { type: Number, default: 0 },
+},
+{
+  timestamps: true // ✅ Thêm này để tự động tạo createdAt, updatedAt
 });
 
 const Question = mongoose.model('Question', questionSchema);
