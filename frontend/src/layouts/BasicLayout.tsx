@@ -1,16 +1,14 @@
 import {
-  FileTextOutlined,
-  HomeOutlined,
   LoginOutlined,
   LogoutOutlined,
-  SearchOutlined,
   UserAddOutlined,
 } from '@ant-design/icons';
-import { Button, Col, Layout, Menu, Row } from 'antd';
+import { Button, Col, Layout, Row } from 'antd';
 import React, { ReactNode } from 'react';
 import { Link } from 'umi';
+import './BasicLayout.css';
 
-const { Header, Sider, Content, Footer } = Layout;
+const { Header, Content, Footer } = Layout;
 
 interface BasicLayoutProps {
   children: ReactNode;
@@ -22,88 +20,58 @@ const BasicLayout: React.FC<BasicLayoutProps> = ({ children, user }) => {
     localStorage.removeItem('user');
     window.location.href = '/login'; // Điều hướng về trang đăng nhập
   };
-
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ background: '#001529', padding: '0 20px' }}>
-        <Row justify="space-between" align="middle">
-          <Col>
-            <div style={{ color: 'white', fontSize: 24, padding: '16px' }}>
-              Diễn đàn Hỏi Đáp Sinh Viên
+    <Layout className="layout-container">
+      <Header className="header-container">
+        <Row justify="space-between" align="middle" className="header-row">
+          <Col className="header-left">
+            <div className="logo">
+              StudyForum
             </div>
+            <Link to="/" style={{ color: '#000000' }}>Trang chủ</Link>
+            <Link to="/post-question" style={{ color: '#000000' }}>Đặt câu hỏi</Link>
+            <Link to="/search" style={{ color: '#000000' }}>Tìm kiếm câu hỏi</Link>
+            <Link to="/admin" style={{ color: '#000000' }}>Quản trị viên</Link>
           </Col>
           <Col>
             {user ? (
-              <div style={{ color: 'white' }}>
-                <span>Chào, {user.username}</span>
+              <div className="user-info">
+                <span className="user-greeting">Chào, {user.username}</span>
                 <Button
                   type="link"
-                  style={{ color: 'white' }}
+                  className="logout-button"
                   onClick={handleLogout}
                 >
                   <LogoutOutlined /> Đăng xuất
                 </Button>
               </div>
             ) : (
-              <>
-                <Button type="link" style={{ color: 'white' }}>
+              <div className="auth-buttons">
+                <Button type="link" className="auth-button">
                   <Link to="/login">
                     <LoginOutlined /> Đăng nhập
                   </Link>
                 </Button>
-                <Button type="link" style={{ color: 'white' }}>
+                <Button type="link" className="auth-button">
                   <Link to="/register">
                     <UserAddOutlined /> Đăng ký
                   </Link>
                 </Button>
-              </>
+              </div>
             )}
           </Col>
         </Row>
-      </Header>
-
-      <Layout style={{ padding: '20px 24px' }}>
-        <Sider width={250} className="site-layout-background" theme="dark">
-          <Menu
-            mode="inline"
-            defaultSelectedKeys={['1']}
-            style={{ height: '100%', borderRight: 0 }}
-          >
-            <Menu.Item key="1" icon={<HomeOutlined />}>
-              <Link to="/">Trang chủ</Link>
-            </Menu.Item>
-            <Menu.Item key="2" icon={<FileTextOutlined />}>
-              <Link to="/post-question">Tạo câu hỏi</Link>
-            </Menu.Item>
-            <Menu.Item key="3" icon={<SearchOutlined />}>
-              <Link to="/search">Tìm kiếm câu hỏi</Link>
-            </Menu.Item>
-            {user && user.role === 'admin' && (
-              <Menu.Item key="4" icon={<UserAddOutlined />}>
-                <Link to="/admin">Quản trị viên</Link>
-              </Menu.Item>
-            )}
-          </Menu>
-        </Sider>
-
-        <Layout style={{ padding: '0 24px 24px' }}>
-          <Content
-            style={{
-              padding: 24,
-              margin: 0,
-              minHeight: 280,
-              backgroundColor: '#fff',
-            }}
-          >
+      </Header>      
+      <Layout className="main-layout">
+        <Layout className="content-layout">
+          <Content className="main-content">
             {children}
           </Content>
         </Layout>
       </Layout>
 
-      <Footer
-        style={{ textAlign: 'center', background: '#f0f2f5', padding: '10px' }}
-      >
-        <p>© 2025 Diễn đàn Hỏi Đáp Sinh Viên. All rights reserved.</p>
+      <Footer className="footer-container">
+        <p className="footer-text">© 2025 Diễn đàn Hỏi Đáp Sinh Viên. All rights reserved.</p>
       </Footer>
     </Layout>
   );
