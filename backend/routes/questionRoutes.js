@@ -1,7 +1,7 @@
 // ✅ Sửa lại như sau:
 const express = require('express');
 const router = express.Router();
-const { postQuestion, getAllQuestions, getQuestionById, addComment, replyToComment, voteComment, voteQuestion, getQuestionsBySearch, getQuestionsByTag, deleteQuestion } = require('../controllers/questionController');
+const { postQuestion, getAllQuestions, getQuestionById, addComment, replyToComment, voteComment, voteQuestion, getQuestionsBySearch, getQuestionsByTag, deleteQuestion, increaseView } = require('../controllers/questionController');
 
 // Đặt các route tĩnh lên trước
 router.get('/search', getQuestionsBySearch);
@@ -15,5 +15,6 @@ router.post('/:id/comments/:commentIndex/replies', replyToComment);
 router.post('/:id/vote', voteQuestion);
 router.post('/:id/comments/:commentIndex/vote', voteComment);
 router.delete('/:id', deleteQuestion); // Thêm dòng này nếu chưa có
+router.post('/:id/view', increaseView);
 
 module.exports = router;

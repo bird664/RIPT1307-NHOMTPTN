@@ -126,8 +126,14 @@ const HomePage: React.FC = () => {
                       <a
                         href={`/questions/${question._id}`}
                         className="question-title-link"
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.preventDefault();
+                          // Gửi request tăng views
+                          try {
+                            await axios.post(`http://localhost:5000/api/questions/${question._id}/view`);
+                          } catch (err) {
+                            // Có thể bỏ qua lỗi này
+                          }
                           navigate(`/questions/${question._id}`);
                         }}
                       >
@@ -223,11 +229,13 @@ const HomePage: React.FC = () => {
               <div className="stats-list">
                 <div className="stat-row">
                   <span className="stat-label">Tổng câu hỏi:</span>
-                  <span className="stat-value">1,234</span>
+                  <span className="stat-value">{questions.length}</span>
                 </div>
                 <div className="stat-row">
-                  <span className="stat-label">Câu hỏi hôm nay:</span>
-                  <span className="stat-value">{questions.length}</span>
+                  <span className="stat-label">Tổng lượt xem:</span>
+                  <span className="stat-value">
+                    {questions.reduce((sum, q) => sum + (q.views || 0), 0)}
+                  </span>
                 </div>
                 <div className="stat-row">
                   <span className="stat-label">Người dùng:</span>

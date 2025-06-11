@@ -20,6 +20,7 @@ const QuestionDetailPage: React.FC = () => {
   useEffect(() => {
     const fetchQuestion = async () => {
       try {
+        await axios.post(`http://localhost:5000/api/questions/${id}/view`);
         const response = await axios.get(`http://localhost:5000/api/questions/${id}`);
         setQuestion(response.data.question);
         setComments(response.data.question.comments || []);

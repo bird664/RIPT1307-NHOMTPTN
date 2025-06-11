@@ -200,6 +200,17 @@ const deleteQuestion = async (req, res) => {
     res.status(500).json({ message: 'Lỗi khi xóa bài đăng', error: error.message });
   }
 };
+const increaseView = async (req, res) => {
+  try {
+    const question = await Question.findById(req.params.id);
+    if (!question) return res.status(404).json({ message: 'Không tìm thấy câu hỏi' });
+    question.views = (question.views || 0) + 1;
+    await question.save();
+    res.json({ views: question.views });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi cập nhật lượt xem' });
+  }
+};
 module.exports = {
   postQuestion,
   getAllQuestions,  // Thêm hàm lấy tất cả câu hỏi
@@ -211,4 +222,5 @@ module.exports = {
   getQuestionsBySearch,
   getQuestionsByTag,
   deleteQuestion,
+  increaseView,
 };
